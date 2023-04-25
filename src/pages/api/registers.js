@@ -3,17 +3,18 @@ import connectMongo from "database/conn";
 import { createRouter, expressWrapper } from "next-connect";
 import cors from "cors";
 // Controllers
-import { addRegisters } from "controllers/Registers";
+import { addRegisters, getRegisters, removeRegisters } from "controllers/Registers";
 
 const router = createRouter();
 connectMongo();
 
+console.log("POST /api/registers")
+
 router
   .use(expressWrapper(cors()))
-  .post((req, res) => {
-    console.log("POST /api/registers")
-    addRegisters(req, res)
-  });
+  .get(getRegisters)
+  .post(addRegisters)
+  .delete(removeRegisters)
 
 export default router.handler({
   onError: (err, req, res) => {

@@ -1,16 +1,17 @@
 // Dependencies
 import Head from "next/head";
 import Swal from 'sweetalert2';
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import csvtojson from "csvtojson";
 // Components
 import { Input, Button, Loading } from "@nextui-org/react";
 // Services
-import { createRegisters } from "@services/registers";
+import { createRegisters, getRegisters } from "@services/registers";
 
 export default function Home() {
 
   const [loading, setLoading] = useState(false);
+  const [registers, setRegisters] = useState([]);
 
   const handleImportFile = async (e) => {
     e.preventDefault();
@@ -36,26 +37,38 @@ export default function Home() {
       setLoading(false);
     }
     // get file content
-    const fileContent = await file.text();
-    let fileTransformed = await csvtojson().fromString(fileContent);
+    // get 10 first registers
+    const fileContent = await file.text()
+    const fileTransformed = await csvtojson().fromString(fileContent)
+    // separate registers in chunks of 50000
+    const chunkSize = 20000;
+    const chunks = [];
+    for (let i = 0; i < fileTransformed.length; i += chunkSize) {
+      chunks.push(fileTransformed.slice(i, i + chunkSize));
+    }
 
-    createRegisters(fileTransformed)
-      .then(() => {
-        Swal.fire(
-          'Archivo importado',
-          'El archivo se ha importado correctamente',
-          'success'
-        )
-      })
-      .catch(() => {
-        Swal.fire(
-          'Error al importar el archivo',
-          'Por favor intenta de nuevo',
-          'error'
-        )
-      })
-      .finally(() => setLoading(false));
+    // send chunks to server
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      await createRegisters(chunk);
+    }
+    Swal.fire(
+      'Archivo importado',
+      'El archivo se ha importado correctamente',
+      'success'
+    )
+
+      setLoading(false)
   };
+
+  const handleGetRegisters = async () => {
+    const registers = await getRegisters();
+    setRegisters(registers);
+  }
+
+  useEffect(() => {
+    handleGetRegisters();
+  }, []);
 
   return (
     <>

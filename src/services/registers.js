@@ -23,3 +23,27 @@ export const createRegisters = (data) =>
         reject(getError(error));
       });
   });
+
+
+export const getRegisters = () =>
+  new Promise((resolve, reject) => {
+    Axios.get(endPoints.registers.main)
+      .then((response) => {
+        resolve(response.data);
+      })
+      .catch((error) => {
+        reject(getError(error));
+      });
+  });
+
+
+  export const removeRegisters = () =>
+    new Promise((resolve, reject) => {
+      Axios.delete(endPoints.registers.main)
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          reject(getError(error));
+        });
+    });
