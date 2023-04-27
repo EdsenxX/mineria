@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { removeRegisters, getRegisters } from "@services/registers";
 // Components
 import { Button, Loading } from "@nextui-org/react";
+import BarChart from "@components/BarChart";
 
 export default function Main() {
   const router = useRouter();
@@ -52,26 +53,35 @@ export default function Main() {
   return (
     <div className="flex justify-center">
       <div className="w-[80%] my-5">
-        <h2 className="font-bold text-xl mb-2">Danger Zone</h2>
-        <div className="border-2 border-red-500 p-4 rounded-xl border-da">
-          <p>Elimina todos los registros de la base de datos.</p>
-          <p>
-            <span className="font-bold">Nota:</span> Esta accion no se puede
-            revertir.
-          </p>
-          <Button
-            onClick={cleanDataBase}
-            color="error"
-            shadow
-            className="mt-4"
-            icon={
-              loading && (
-                <Loading type="spinner" color="currentColor" size="sm" />
-              )
-            }
-          >
-            Limpiar base de datos
-          </Button>
+        <div>
+          <h2 className="font-bold text-xl mb-2">Danger Zone</h2>
+          <div className="border-2 border-red-500 p-4 rounded-xl border-da">
+            <p>Elimina todos los registros de la base de datos.</p>
+            <p>
+              <span className="font-bold">Nota:</span> Esta accion no se puede
+              revertir.
+            </p>
+            <Button
+              onClick={cleanDataBase}
+              color="error"
+              shadow
+              className="mt-4"
+              icon={
+                loading && (
+                  <Loading type="spinner" color="currentColor" size="sm" />
+                )
+              }
+            >
+              Limpiar base de datos
+            </Button>
+          </div>
+        </div>
+        <div className="mt-10 grid grid-cols-2">
+          <div className="shadow-xl p-10 h-[400px]">
+
+          <BarChart title="Developers Salaries" />
+
+          </div>
         </div>
       </div>
     </div>
