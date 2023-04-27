@@ -3,21 +3,33 @@ import Head from "next/head";
 import Swal from 'sweetalert2';
 import { useState, useEffect } from 'react'
 import csvtojson from "csvtojson";
+import { useRouter } from "next/router";
 // Components
-import { Input, Button, Loading } from "@nextui-org/react";
+import { Button, Loading, Progress } from "@nextui-org/react";
+import InputFile from "@components/InputFile";
 // Services
 import { createRegisters, getRegisters } from "@services/registers";
+// Utils
+import typeFiles from "@utils/typeFiles.constants";
+import { csvFile } from "@utils/defaultTypeFileError";
 
 export default function Home() {
 
+  const router = useRouter();
+
+  const { csv } = typeFiles;
+
   const [loading, setLoading] = useState(false);
-  const [registers, setRegisters] = useState([]);
+  const [dynamicText, setDynamicText] = useState("");
+  const [files, setFiles] = useState([]);
+  const [progress, setProgress] = useState(0);
 
   const handleImportFile = async (e) => {
+
     e.preventDefault();
     if(loading) return;
     setLoading(true);
-    const file = e.target.file.files[0];
+    const file = document.getElementById('files').files[0];
     if(!file) {
       Swal.fire(
         'Archivo no valido',
@@ -38,6 +50,7 @@ export default function Home() {
     }
     // get file content
     // get 10 first registers
+    setDynamicText('Dividiendo el archivo en chunks de 20000....')
     const fileContent = await file.text()
     const fileTransformed = await csvtojson().fromString(fileContent)
     // separate registers in chunks of 50000
@@ -49,26 +62,44 @@ export default function Home() {
 
     // send chunks to server
     for (let i = 0; i < chunks.length; i++) {
+      setDynamicText(`Enviando chunk ${i + 1} de ${chunks.length} al servidor...`)
       const chunk = chunks[i];
       await createRegisters(chunk);
+      setProgress(((i + 1) / chunks.length) * 100);
     }
+    setLoading(false)
+
+    setDynamicText('Archivo importado correctamente')
     Swal.fire(
       'Archivo importado',
       'El archivo se ha importado correctamente',
       'success'
     )
-
-      setLoading(false)
+    router.push('/main')
   };
 
   const handleGetRegisters = async () => {
     const registers = await getRegisters();
-    setRegisters(registers);
+    if(registers.length) {
+      router.push('/main')
+    }
   }
 
   useEffect(() => {
     handleGetRegisters();
   }, []);
+
+  const handleAddFiles = (rawFiles) => {
+    const filesAux = files;
+    filesAux.push(...rawFiles);
+    setFiles([...filesAux]);
+  };
+
+  const handleRemoveFiles = (idx) => {
+    const filesAux = [...files];
+    filesAux.splice(idx, 1);
+    setFiles(filesAux);
+  };
 
   return (
     <>
@@ -79,11 +110,24 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex justify-center items-center min-w-screen min-h-screen">
-        <form onSubmit={handleImportFile} className="bg-white shadow-xl shadow-white/20 p-4 rounded-xl text-black flex flex-col items-center gap-2 min-w-[400px]">
-          <p className="text-xl">Importa el archivo de tu dataset</p>
-          <Input type="file" name="file" id="" />
+        <form onSubmit={handleImportFile} className="bg-white shadow-xl p-4 rounded-xl text-black flex flex-col items-center gap-2 min-w-[400px]">
+          <p className="text-xl font-bold mb-5">Importa el archivo de tu dataset</p>
+          <InputFile
+            id="files"
+            onChange={handleAddFiles}
+            onRemoveFile={handleRemoveFiles}
+            files={files}
+            allowedTypes={[csv]}
+            defaultTypeFileError={csvFile}
+          />
           <Button type="submit" icon={loading && <Loading type="spinner" color="currentColor" size="sm" />}> Importar </Button>
-          {loading && <p className="text-sm">Por favor espere, este proceso puede tardar varios minutos</p>}
+          {loading && (
+            <>
+              <Progress color="primary" size="md" value={progress} />
+              <p className="text-sm">Por favor espere, este proceso puede tardar varios minutos</p>
+              <p className="text-sm">{dynamicText}</p>
+            </>
+          )}
         </form>
       </main>
     </>
