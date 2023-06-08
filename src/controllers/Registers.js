@@ -44,7 +44,7 @@ export async function removeRegisters(req, res) {
 
 export async function getGeneralData(req, res) {
   try {
-    const hobby = await RegisterModel.aggregate([
+    const Hobby = await RegisterModel.aggregate([
       {
         $group: {
           _id: "$Hobby",
@@ -52,7 +52,7 @@ export async function getGeneralData(req, res) {
         },
       }
     ]);
-    const country = await RegisterModel.aggregate([
+    const Country = await RegisterModel.aggregate([
       {
         $group: {
           _id: "$Country",
@@ -60,7 +60,7 @@ export async function getGeneralData(req, res) {
         },
       }
     ]);
-    const age = await RegisterModel.aggregate([
+    const Age = await RegisterModel.aggregate([
       {
         $group: {
           _id: "$Age",
@@ -68,7 +68,7 @@ export async function getGeneralData(req, res) {
         },
       }
     ]);
-    const students = await RegisterModel.aggregate([
+    const Student = await RegisterModel.aggregate([
       {
         $group: {
           _id: "$Student",
@@ -92,15 +92,24 @@ export async function getGeneralData(req, res) {
         },
       }
     ]);
+    const JobSatisfaction = await RegisterModel.aggregate([
+      {
+        $group: {
+          _id: "$JobSatisfaction",
+          count: { $sum: 1 },
+        },
+      }
+    ]);
     res.status(200).json({
       message: "Datos generales",
       data: {
-        hobby,
-        country,
-        age,
-        students,
+        Hobby,
+        Age,
+        Student,
         YearsCodingProf,
         OperatingSystem,
+        JobSatisfaction,
+        Country,
       },
       status: {
         code: 200,
@@ -111,6 +120,41 @@ export async function getGeneralData(req, res) {
     console.log("Error al genera datos generales >>>> ", error);
     res.status(500).json({
       message: error.message,
+    });
+  }
+}
+
+export async function getSatisfactionData(req, res) {
+  try {
+    const params = req.query;
+    console.log({ params })
+    const satisfaction = await RegisterModel.aggregate([
+      {
+        $match: params,
+      },
+      {
+        $group: {
+          _id: "$JobSatisfaction",
+          count: { $sum: 1 },
+        },
+      }
+    ]);
+    res.status(200).json({
+      message: "Datos generales",
+      data: satisfaction,
+      status: {
+        code: 200,
+        message: "OK",
+      }
+    });
+  } catch (error) {
+    console.log("Error al genera datos generales >>>> ", error);
+    res.status(500).json({
+      message: error.message,
+      status: {
+        code: 500,
+        message: "Internal Server Error"
+      }
     });
   }
 }

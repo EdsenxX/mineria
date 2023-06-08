@@ -4,6 +4,7 @@ const endPoints = {
   registers: {
     main: `/api/registers`,
     generalData: `/api/registers/generalData`,
+    satisfaction: `/api/registers/satisfaction`,
   },
 };
 

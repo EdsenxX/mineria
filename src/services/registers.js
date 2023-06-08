@@ -58,3 +58,14 @@ export const getRegisters = () =>
           reject(getError(error));
         });
     });
+
+  export const getSatisfactionData = (queryParams) =>
+    new Promise((resolve, reject) => {
+      Axios.get(endPoints.registers.satisfaction, { params: queryParams })
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          reject(getError(error));
+        });
+    });
