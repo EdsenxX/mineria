@@ -127,7 +127,6 @@ export async function getGeneralData(req, res) {
 export async function getSatisfactionData(req, res) {
   try {
     const params = req.query;
-    console.log({ params })
     const satisfaction = await RegisterModel.aggregate([
       {
         $match: params,

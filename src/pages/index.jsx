@@ -31,7 +31,7 @@ export default function Home() {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
-    const file = document.getElementById("files").files[0];
+    const file = files[0];
     if (!file) {
       Swal.fire(
         "Archivo no valido",
