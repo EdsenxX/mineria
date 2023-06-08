@@ -20,7 +20,7 @@ export default function Home() {
   const { csv } = typeFiles;
 
   const [loading, setLoading] = useState(false);
-  const [dynamicText, setDynamicText] = useState("");
+  const [dynamicText, setDynamicText] = useState("Número maximo de registros: 100,000");
   const [files, setFiles] = useState([]);
   const [progress, setProgress] = useState(0);
 
@@ -57,6 +57,9 @@ export default function Home() {
     const chunkSize = 20000;
     const chunks = [];
     for (let i = 0; i < fileTransformed.length; i += chunkSize) {
+      if(chunks.length >= 5) {
+        break;
+      }
       chunks.push(fileTransformed.slice(i, i + chunkSize));
     }
 
@@ -121,13 +124,15 @@ export default function Home() {
             defaultTypeFileError={csvFile}
           />
           <Button type="submit" icon={loading && <Loading type="spinner" color="currentColor" size="sm" />}> Importar </Button>
-          {loading && (
             <>
-              <Progress color="primary" size="md" value={progress} />
-              <p className="text-sm">Por favor espere, este proceso puede tardar varios minutos</p>
+              {loading && (
+                <>
+                  <Progress color="primary" size="md" value={progress} />
+                  <p className="text-sm">Por favor espere, este proceso puede tardar varios minutos</p>
+                </>
+              )}
               <p className="text-sm">{dynamicText}</p>
             </>
-          )}
         </form>
       </main>
     </>
