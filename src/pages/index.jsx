@@ -52,14 +52,14 @@ export default function Home() {
     }
     // get file content
     // get 10 first registers
-    setDynamicText("Dividiendo el archivo en chunks de 1000....");
+    setDynamicText("Dividiendo el archivo en chunks de 100....");
     const fileContent = await file.text();
     const fileTransformed = await csvtojson().fromString(fileContent);
     // separate registers in chunks of 50000
-    const chunkSize = 1000;
+    const chunkSize = 100;
     const chunks = [];
     for (let i = 0; i < fileTransformed.length; i += chunkSize) {
-      if (chunks.length >= 100) {
+      if (chunks.length >= 1000) {
         break;
       }
       chunks.push(fileTransformed.slice(i, i + chunkSize));
