@@ -4,16 +4,22 @@ import Swal from "sweetalert2";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 // Services
-import { removeRegisters, getRegisters } from "@services/registers";
+import {
+  removeRegisters,
+  getRegisters,
+  generalData,
+} from "@services/registers";
 // Components
 import { Button, Loading } from "@nextui-org/react";
 import BarChart from "@components/BarChart";
+import Loader from "@components/Loader";
 
 export default function Main() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
   const [registers, setRegisters] = useState([]);
+  const [generalRegisters, setGeneralRegisters] = useState({});
 
   const handleGetRegisters = async () => {
     const registers = await getRegisters();
@@ -23,8 +29,16 @@ export default function Main() {
     setRegisters(registers);
   };
 
+  const handleGetGeneralData = async () => {
+    setLoading(true);
+    const res = await generalData();
+    setGeneralRegisters(res.data || {});
+    setLoading(false);
+  };
+
   useEffect(() => {
     handleGetRegisters();
+    handleGetGeneralData();
   }, []);
 
   const cleanDataBase = async () => {
@@ -76,13 +90,53 @@ export default function Main() {
             </Button>
           </div>
         </div>
-        <div className="mt-10 grid grid-cols-2">
-          <div className="shadow-xl p-10 h-[400px]">
-
-          <BarChart title="Developers Salaries" />
-
+        {loading && <Loader />}
+        {Object.keys(generalRegisters).length && (
+          <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
+            <div className="shadow-xl p-10 h-auto rounded-lg">
+              <BarChart
+                title="Programadores que su hobby es programar"
+                labels={generalRegisters?.hobby?.map((person) => person._id)}
+                data={generalRegisters?.hobby?.map((person) => person.count)}
+              />
+            </div>
+            <div className="shadow-xl p-10 h-auto rounded-lg">
+              <BarChart
+                title="Nacionalidad de los programadores"
+                labels={generalRegisters?.country?.map((person) => person._id)}
+                data={generalRegisters?.country?.map((person) => person.count)}
+              />
+            </div>
+            <div className="shadow-xl p-10 h-auto rounded-lg">
+              <BarChart
+                title="Edad de los programadores"
+                labels={generalRegisters?.age?.map((person) => person._id)}
+                data={generalRegisters?.age?.map((person) => person.count)}
+              />
+            </div>
+            <div className="shadow-xl p-10 h-auto rounded-lg">
+              <BarChart
+                title="Programadores estudiando"
+                labels={generalRegisters?.students?.map((person) => person._id)}
+                data={generalRegisters?.students?.map((person) => person.count)}
+              />
+            </div>
+            <div className="shadow-xl p-10 h-auto rounded-lg">
+              <BarChart
+                title="Experiencia profesional"
+                labels={generalRegisters?.YearsCodingProf?.map((person) => person._id)}
+                data={generalRegisters?.YearsCodingProf?.map((person) => person.count)}
+              />
+            </div>
+            <div className="shadow-xl p-10 h-auto rounded-lg">
+              <BarChart
+                title="Sistema operativos"
+                labels={generalRegisters?.OperatingSystem?.map((person) => person._id)}
+                data={generalRegisters?.OperatingSystem?.map((person) => person.count)}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

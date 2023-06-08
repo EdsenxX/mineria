@@ -20,8 +20,11 @@ ChartJS.register(
 );
 
 const BarChart = ({
-  title
+  title,
+  labels,
+  data,
 }) => {
+
   const [chartData, setChartData] = useState({
     datasets: [],
   });
@@ -29,11 +32,11 @@ const BarChart = ({
 
   useEffect(() => {
     setChartData({
-      labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      labels: labels,
       datasets: [
         {
-          label: "Sales $",
-          data: [10, 15, 5, 20, 15, 5, 5],
+          label: "Programadores",
+          data: data,
           borderColor: "#F1F5F9",
           backgroundColor: "#3482F6",
         },
@@ -51,24 +54,11 @@ const BarChart = ({
       },
       maintainAspectRatio: false,
       responsive: true,
-      // remove grid lines and border
-      scales: {
-        x: {
-          grid: {
-            display: false,
-          },
-        },
-        y: {
-          grid: {
-            display: false,
-          },
-        },
-      },
     });
   }, [title]);
   return (
     <>
-      <div className="bh-white m-auto h-[50vh] w-full rounded-lg border p-4 md:col-span-2 lg:h-[70vh]">
+      <div className="bh-white m-auto w-full rounded-lg border p-4 md:col-span-2">
         <Bar data={chartData} options={chartOptions} />
       </div>
     </>

@@ -47,3 +47,14 @@ export const getRegisters = () =>
           reject(getError(error));
         });
     });
+
+  export const generalData = () =>
+    new Promise((resolve, reject) => {
+      Axios.get(endPoints.registers.generalData)
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          reject(getError(error));
+        });
+    });
